@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href="//cdn.staticfile.net/Primer/21.0.7/primer.css" rel="stylesheet" />
+    <link rel="icon" href="https://github.githubassets.com/favicons/favicon.svg"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="## 类型
+
+### 变量
+
+变量使用let定义，常量使用const定义，变量默认是immutable的，如果需要声明一个mutable的变量，使用let mut
+
+可以多次使用let定义名字相同的变量（变量的类型可以不同），后定义的变量会遮蔽掉前一个变量，以减少取名的麻烦
+
+编译器在大部分情况下会根据上下文自动推倒变量的类型，但在有可能出现二义性的情况下，必须显式声明变量的类型，`let v:T`，可以声明部分类型，让编译器去推导剩下的类型
+
+数字类型有i8,i16,i32,i64,isize，及对应的无符号类型，u前缀，一般使用i32或u32，索引使用usize
+
+### 类型别名
+
+```
+type Age = u32;//可以是泛型type Double<T> = (T,Vec<T>)
+```
+
+### 全局变量
+
+用static关键字声明，生命周期是’staitc，是整个程序执行期间
+
+- 全局变量必须在声明的时候马上初始化
+- 全局变量的初始化值必须是编译期可确定的常量，不能包括运行时才能确定的表达式、语句和函数调用(const fn是可以的)
+- 带有mut修饰的全局变量，在使用的时候必须使用unsafe关键字
+
+### 常量
+
+用const声明,不是变量,初始化的值必须是编译期常量,没有模式匹配的效果
+
+## 基本数据类型
+
+### tuple和array
+
+可以通过pattern match解构元组，也可以使用t.index来访问其中的元素，如t.0,t.1
+
+array的长度是固定的，越界访问会panic
+
+### 函数
+
+函数的定义
+
+```
+fn function<'a,T>(x:&'a T)->&'a T{}
+```
+
+参数的类型必须显式声明
+
+### 语句(statement)和表达式(expression)的区别
+
+语句是一条指令，实现一个动作，以分号结尾，没有结果值 表达式求值得出一个结果值 表达式和语句的区分是Rust和一些语言（如C）的区别之一
+
+函数由一系列语句和可选的表示返回值的表达式组成
+
+### Struct
+
+```
+//可以定义一个tuple structstruct Foo(i32,i32);//然后这样使用let foo = Foo(42,49);println!('{}.{}',foo.0,foo.1);
+```
+
+### 循环
+
+```
+    while C{      }    loop{ //无限循环    }    for E in C{    }
+```
+
+```
+fn main() {    //Like range in python    for i in 1..4 {        println!('{}!', i);    }    println!('done!');}
+```
+
+### ref 和 &
+
+```
+// 下面两行是等价的,a的类型都是&i32,一般情况下都用&，具体看http://xion.io/post/code/rust-patterns-ref.htmllet ref a = 2;let a = &2;
+```
+
+要理解两者的区别，需要理解什么是模式匹配，&会成为模式的一部分，ref不会，所以
+
+```
+fn main() {    let s = String::from('hello');    // let &sf = &s; 这句不能通过编译，sf的类型推导为String，sf会通过&s取得s的所有权，无法通过brrow check    let ref sf = &s; //可以编译，ref不影响pattern，sf的类型为 &&s}
+```
+
+引用类型要配合生命周期使用
+
+### 模式匹配
+
+看[[这篇文章](http://xion.io/post/code/rust-patterns-ref.html)](http://xion.io/post/code/rust-patterns-ref.html)
+
+### 模块化
+
+每个文件作为一个模块，或者文件夹为模块名，其中的mod.rs为模块入口，or mod’s namespace in single file. mod can be nested
+
+### case need to annotate types annotate
+
+use `collect` to return a container
+
+### closure
+
+infer capture value according to function use in closure, priority is &T, &mut T and T Using move before vertical pipes forces closure to take ownership of captured variables
+
+the compiler will capture variables in the least restrictive manner possible. For instance, consider a parameter annotated as FnOnce. This specifies that the closure may capture by &T, &mut T or T, but the compiler will ultimately choose based on how the captured variables are used in the closure. 换句话说，每个closure至少都会实现FnOnce(表示最多可调用一次），call方法的第一个参数为self，如果该closure最多只有对外部环境的&mut访问，则会增加实现FnMut，call方法的第一个参数为&mut sefl，如果只有对外部环境的&访问，则实现Fn,表示该函数可重复调用且无副作用（也就是纯函数）,call方法的第一个参数为&self
+
+Fn系列trait包含函数参数和返回值，比如FnOnce(E)->F 表示接收E类型的参数返回F类型的可调用一次的函数,FnOnce()表示函数没有参数也没有返回值
+
+接受一个匿名函数为参数的函数必须声明泛型参数，调用时编译器会根据传入的匿名函数类型自动推导该参数
+
+Diverging functions never return. They are marked using !, which is an empty type.
+
+### Associated types
+
+[[看这篇文章的](https://doc.rust-lang.org/rust-by-example/generics/assoc_items/types.html)](https://doc.rust-lang.org/rust-by-example/generics/assoc_items/types.html)
+
+### 迭代器
+
+调用next方法返回Option，结尾处返回None 迭代器本身是mutable的，不需要显式声明，因此只能使用一次 iter返回的是元素的inmutable reference iter_mut返回mutable reference into_iter move ownership to return value 迭代器的某些方法会消费这个迭代器（转移这个迭代器的所有权），比如sum方法，调用这类方法后迭代器就无效了（类似值被移走了） 另一些方法称作迭代器适配器，比如map，将某一函数作用在迭代器的所有元素上，这些函数是lazy的，需要在最后调用consumed方法才会执行，比如collent方法
+
+实现 Iterator trait只需要实现next方法
+
+### 智能指针
+
+四种智能指针
+
+- `Box<T>` 对应C++中的`unique_ptr`
+- `Rc<T>`和`RefCell<T>`对应C++中的`shared_ptr`，区别是前者只能返回inmutable引用，后者可以返回inmutable或mutable引用
+- `Weak<T>`对应C++中的`weak_ptr`
+- `Arc<T>`是线程安全的`RC<T>`(Atomically Reference Counted)，只能返回immutable引用，如果需要修改状态，可以在其中装`Mutex`,`Rwlock`或者原子类型。">
+<meta property="og:title" content="Rust 基础">
+<meta property="og:description" content="## 类型
+
+### 变量
+
+变量使用let定义，常量使用const定义，变量默认是immutable的，如果需要声明一个mutable的变量，使用let mut
+
+可以多次使用let定义名字相同的变量（变量的类型可以不同），后定义的变量会遮蔽掉前一个变量，以减少取名的麻烦
+
+编译器在大部分情况下会根据上下文自动推倒变量的类型，但在有可能出现二义性的情况下，必须显式声明变量的类型，`let v:T`，可以声明部分类型，让编译器去推导剩下的类型
+
+数字类型有i8,i16,i32,i64,isize，及对应的无符号类型，u前缀，一般使用i32或u32，索引使用usize
+
+### 类型别名
+
+```
+type Age = u32;//可以是泛型type Double<T> = (T,Vec<T>)
+```
+
+### 全局变量
+
+用static关键字声明，生命周期是’staitc，是整个程序执行期间
+
+- 全局变量必须在声明的时候马上初始化
+- 全局变量的初始化值必须是编译期可确定的常量，不能包括运行时才能确定的表达式、语句和函数调用(const fn是可以的)
+- 带有mut修饰的全局变量，在使用的时候必须使用unsafe关键字
+
+### 常量
+
+用const声明,不是变量,初始化的值必须是编译期常量,没有模式匹配的效果
+
+## 基本数据类型
+
+### tuple和array
+
+可以通过pattern match解构元组，也可以使用t.index来访问其中的元素，如t.0,t.1
+
+array的长度是固定的，越界访问会panic
+
+### 函数
+
+函数的定义
+
+```
+fn function<'a,T>(x:&'a T)->&'a T{}
+```
+
+参数的类型必须显式声明
+
+### 语句(statement)和表达式(expression)的区别
+
+语句是一条指令，实现一个动作，以分号结尾，没有结果值 表达式求值得出一个结果值 表达式和语句的区分是Rust和一些语言（如C）的区别之一
+
+函数由一系列语句和可选的表示返回值的表达式组成
+
+### Struct
+
+```
+//可以定义一个tuple structstruct Foo(i32,i32);//然后这样使用let foo = Foo(42,49);println!('{}.{}',foo.0,foo.1);
+```
+
+### 循环
+
+```
+    while C{      }    loop{ //无限循环    }    for E in C{    }
+```
+
+```
+fn main() {    //Like range in python    for i in 1..4 {        println!('{}!', i);    }    println!('done!');}
+```
+
+### ref 和 &
+
+```
+// 下面两行是等价的,a的类型都是&i32,一般情况下都用&，具体看http://xion.io/post/code/rust-patterns-ref.htmllet ref a = 2;let a = &2;
+```
+
+要理解两者的区别，需要理解什么是模式匹配，&会成为模式的一部分，ref不会，所以
+
+```
+fn main() {    let s = String::from('hello');    // let &sf = &s; 这句不能通过编译，sf的类型推导为String，sf会通过&s取得s的所有权，无法通过brrow check    let ref sf = &s; //可以编译，ref不影响pattern，sf的类型为 &&s}
+```
+
+引用类型要配合生命周期使用
+
+### 模式匹配
+
+看[[这篇文章](http://xion.io/post/code/rust-patterns-ref.html)](http://xion.io/post/code/rust-patterns-ref.html)
+
+### 模块化
+
+每个文件作为一个模块，或者文件夹为模块名，其中的mod.rs为模块入口，or mod’s namespace in single file. mod can be nested
+
+### case need to annotate types annotate
+
+use `collect` to return a container
+
+### closure
+
+infer capture value according to function use in closure, priority is &T, &mut T and T Using move before vertical pipes forces closure to take ownership of captured variables
+
+the compiler will capture variables in the least restrictive manner possible. For instance, consider a parameter annotated as FnOnce. This specifies that the closure may capture by &T, &mut T or T, but the compiler will ultimately choose based on how the captured variables are used in the closure. 换句话说，每个closure至少都会实现FnOnce(表示最多可调用一次），call方法的第一个参数为self，如果该closure最多只有对外部环境的&mut访问，则会增加实现FnMut，call方法的第一个参数为&mut sefl，如果只有对外部环境的&访问，则实现Fn,表示该函数可重复调用且无副作用（也就是纯函数）,call方法的第一个参数为&self
+
+Fn系列trait包含函数参数和返回值，比如FnOnce(E)->F 表示接收E类型的参数返回F类型的可调用一次的函数,FnOnce()表示函数没有参数也没有返回值
+
+接受一个匿名函数为参数的函数必须声明泛型参数，调用时编译器会根据传入的匿名函数类型自动推导该参数
+
+Diverging functions never return. They are marked using !, which is an empty type.
+
+### Associated types
+
+[[看这篇文章的](https://doc.rust-lang.org/rust-by-example/generics/assoc_items/types.html)](https://doc.rust-lang.org/rust-by-example/generics/assoc_items/types.html)
+
+### 迭代器
+
+调用next方法返回Option，结尾处返回None 迭代器本身是mutable的，不需要显式声明，因此只能使用一次 iter返回的是元素的inmutable reference iter_mut返回mutable reference into_iter move ownership to return value 迭代器的某些方法会消费这个迭代器（转移这个迭代器的所有权），比如sum方法，调用这类方法后迭代器就无效了（类似值被移走了） 另一些方法称作迭代器适配器，比如map，将某一函数作用在迭代器的所有元素上，这些函数是lazy的，需要在最后调用consumed方法才会执行，比如collent方法
+
+实现 Iterator trait只需要实现next方法
+
+### 智能指针
+
+四种智能指针
+
+- `Box<T>` 对应C++中的`unique_ptr`
+- `Rc<T>`和`RefCell<T>`对应C++中的`shared_ptr`，区别是前者只能返回inmutable引用，后者可以返回inmutable或mutable引用
+- `Weak<T>`对应C++中的`weak_ptr`
+- `Arc<T>`是线程安全的`RC<T>`(Atomically Reference Counted)，只能返回immutable引用，如果需要修改状态，可以在其中装`Mutex`,`Rwlock`或者原子类型。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://niyoh120.github.io/post/Rust%20-ji-chu.html">
+<meta property="og:image" content="https://github.githubassets.com/favicons/favicon.svg">
+<title>Rust 基础</title>
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">Rust 基础</h1>
+<div class="title-right">
+    <a href="https://niyoh120.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/niyoh120/niyoh120.github.io/issues/4" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h2>类型</h2>
+<h3>变量</h3>
+<p>变量使用let定义，常量使用const定义，变量默认是immutable的，如果需要声明一个mutable的变量，使用let mut</p>
+<p>可以多次使用let定义名字相同的变量（变量的类型可以不同），后定义的变量会遮蔽掉前一个变量，以减少取名的麻烦</p>
+<p>编译器在大部分情况下会根据上下文自动推倒变量的类型，但在有可能出现二义性的情况下，必须显式声明变量的类型，<code class="notranslate">let v:T</code>，可以声明部分类型，让编译器去推导剩下的类型</p>
+<p>数字类型有i8,i16,i32,i64,isize，及对应的无符号类型，u前缀，一般使用i32或u32，索引使用usize</p>
+<h3>类型别名</h3>
+<pre class="notranslate"><code class="notranslate">type Age = u32;//可以是泛型type Double&lt;T&gt; = (T,Vec&lt;T&gt;)
+</code></pre>
+<h3>全局变量</h3>
+<p>用static关键字声明，生命周期是’staitc，是整个程序执行期间</p>
+<ul>
+<li>全局变量必须在声明的时候马上初始化</li>
+<li>全局变量的初始化值必须是编译期可确定的常量，不能包括运行时才能确定的表达式、语句和函数调用(const fn是可以的)</li>
+<li>带有mut修饰的全局变量，在使用的时候必须使用unsafe关键字</li>
+</ul>
+<h3>常量</h3>
+<p>用const声明,不是变量,初始化的值必须是编译期常量,没有模式匹配的效果</p>
+<h2>基本数据类型</h2>
+<h3>tuple和array</h3>
+<p>可以通过pattern match解构元组，也可以使用t.index来访问其中的元素，如t.0,t.1</p>
+<p>array的长度是固定的，越界访问会panic</p>
+<h3>函数</h3>
+<p>函数的定义</p>
+<pre class="notranslate"><code class="notranslate">fn function&lt;'a,T&gt;(x:&amp;'a T)-&gt;&amp;'a T{}
+</code></pre>
+<p>参数的类型必须显式声明</p>
+<h3>语句(statement)和表达式(expression)的区别</h3>
+<p>语句是一条指令，实现一个动作，以分号结尾，没有结果值 表达式求值得出一个结果值 表达式和语句的区分是Rust和一些语言（如C）的区别之一</p>
+<p>函数由一系列语句和可选的表示返回值的表达式组成</p>
+<h3>Struct</h3>
+<pre class="notranslate"><code class="notranslate">//可以定义一个tuple structstruct Foo(i32,i32);//然后这样使用let foo = Foo(42,49);println!("{}.{}",foo.0,foo.1);
+</code></pre>
+<h3>循环</h3>
+<pre class="notranslate"><code class="notranslate">    while C{      }    loop{ //无限循环    }    for E in C{    }
+</code></pre>
+<pre class="notranslate"><code class="notranslate">fn main() {    //Like range in python    for i in 1..4 {        println!("{}!", i);    }    println!("done!");}
+</code></pre>
+<h3>ref 和 &amp;</h3>
+<pre class="notranslate"><code class="notranslate">// 下面两行是等价的,a的类型都是&amp;i32,一般情况下都用&amp;，具体看http://xion.io/post/code/rust-patterns-ref.htmllet ref a = 2;let a = &amp;2;
+</code></pre>
+<p>要理解两者的区别，需要理解什么是模式匹配，&amp;会成为模式的一部分，ref不会，所以</p>
+<pre class="notranslate"><code class="notranslate">fn main() {    let s = String::from("hello");    // let &amp;sf = &amp;s; 这句不能通过编译，sf的类型推导为String，sf会通过&amp;s取得s的所有权，无法通过brrow check    let ref sf = &amp;s; //可以编译，ref不影响pattern，sf的类型为 &amp;&amp;s}
+</code></pre>
+<p>引用类型要配合生命周期使用</p>
+<h3>模式匹配</h3>
+<p>看[<a href="http://xion.io/post/code/rust-patterns-ref.html" rel="nofollow">这篇文章</a>](<a href="http://xion.io/post/code/rust-patterns-ref.html" rel="nofollow">http://xion.io/post/code/rust-patterns-ref.html</a>)</p>
+<h3>模块化</h3>
+<p>每个文件作为一个模块，或者文件夹为模块名，其中的mod.rs为模块入口，or mod’s namespace in single file. mod can be nested</p>
+<h3>case need to annotate types annotate</h3>
+<p>use <code class="notranslate">collect</code> to return a container</p>
+<h3>closure</h3>
+<p>infer capture value according to function use in closure, priority is &amp;T, &amp;mut T and T Using move before vertical pipes forces closure to take ownership of captured variables</p>
+<p>the compiler will capture variables in the least restrictive manner possible. For instance, consider a parameter annotated as FnOnce. This specifies that the closure may capture by &amp;T, &amp;mut T or T, but the compiler will ultimately choose based on how the captured variables are used in the closure. 换句话说，每个closure至少都会实现FnOnce(表示最多可调用一次），call方法的第一个参数为self，如果该closure最多只有对外部环境的&amp;mut访问，则会增加实现FnMut，call方法的第一个参数为&amp;mut sefl，如果只有对外部环境的&amp;访问，则实现Fn,表示该函数可重复调用且无副作用（也就是纯函数）,call方法的第一个参数为&amp;self</p>
+<p>Fn系列trait包含函数参数和返回值，比如FnOnce(E)-&gt;F 表示接收E类型的参数返回F类型的可调用一次的函数,FnOnce()表示函数没有参数也没有返回值</p>
+<p>接受一个匿名函数为参数的函数必须声明泛型参数，调用时编译器会根据传入的匿名函数类型自动推导该参数</p>
+<p>Diverging functions never return. They are marked using !, which is an empty type.</p>
+<h3>Associated types</h3>
+<p>[<a href="https://doc.rust-lang.org/rust-by-example/generics/assoc_items/types.html" rel="nofollow">看这篇文章的</a>](<a href="https://doc.rust-lang.org/rust-by-example/generics/assoc_items/types.html" rel="nofollow">https://doc.rust-lang.org/rust-by-example/generics/assoc_items/types.html</a>)</p>
+<h3>迭代器</h3>
+<p>调用next方法返回Option，结尾处返回None 迭代器本身是mutable的，不需要显式声明，因此只能使用一次 iter返回的是元素的inmutable reference iter_mut返回mutable reference into_iter move ownership to return value 迭代器的某些方法会消费这个迭代器（转移这个迭代器的所有权），比如sum方法，调用这类方法后迭代器就无效了（类似值被移走了） 另一些方法称作迭代器适配器，比如map，将某一函数作用在迭代器的所有元素上，这些函数是lazy的，需要在最后调用consumed方法才会执行，比如collent方法</p>
+<p>实现 Iterator trait只需要实现next方法</p>
+<h3>智能指针</h3>
+<p>四种智能指针</p>
+<ul>
+<li><code class="notranslate">Box&lt;T&gt;</code> 对应C++中的<code class="notranslate">unique_ptr</code></li>
+<li><code class="notranslate">Rc&lt;T&gt;</code>和<code class="notranslate">RefCell&lt;T&gt;</code>对应C++中的<code class="notranslate">shared_ptr</code>，区别是前者只能返回inmutable引用，后者可以返回inmutable或mutable引用</li>
+<li><code class="notranslate">Weak&lt;T&gt;</code>对应C++中的<code class="notranslate">weak_ptr</code></li>
+<li><code class="notranslate">Arc&lt;T&gt;</code>是线程安全的<code class="notranslate">RC&lt;T&gt;</code>(Atomically Reference Counted)，只能返回immutable引用，如果需要修改状态，可以在其中装<code class="notranslate">Mutex</code>,<code class="notranslate">Rwlock</code>或者原子类型</li>
+</ul></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+</div>
+    <div id="footer">Copyright © <span id="year"></span><a href="https://niyoh120.github.io"> Blog Title </a>
+<p>
+<span id="runday"></span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a>
+</p>
+
+<script>
+if(""!=""){
+    var now=new Date();
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("year").innerHTML=now.getFullYear();
+    if(""!=""){document.getElementById("runday").innerHTML=" • "+"网站运行"+diffDay+"天"+" • ";}
+    else{document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";}
+}
+</script>
+</div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n\n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","niyoh120/niyoh120.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+</script>
+
+
+</html>
