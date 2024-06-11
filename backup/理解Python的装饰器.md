@@ -1,4 +1,3 @@
-# 理解Python的装饰器
 
 ```python
 @decorator
@@ -16,7 +15,7 @@ def decorator(func):
         print("in decorator")
         return func(*args,*kw)
     return warp
-s
+
 @decorator
 def foo():
     print("in foo")
@@ -88,9 +87,9 @@ foo2()
 # msg1
 ```
 
-因为装饰器实际上是语法糖，所以有一个问题，装饰器返回的函数并不是原本的函数，原本的函数的一些属性（如文档字符串）可能会丢失。
+因为装饰器实际上是语法糖，所以有一个问题，装饰器返回的函数并不是原本的函数，原本的函数的一些属性（如文档字符串）可能会丢失.
 
-解决方法是使用`functools.wraps`，它会将原来函数的属性复制到装饰器返回的函数中。
+解决方法是使用`functools.wraps`，它会将原来函数的属性复制到装饰器返回的函数中.
 
 ```python
 from functools import wraps

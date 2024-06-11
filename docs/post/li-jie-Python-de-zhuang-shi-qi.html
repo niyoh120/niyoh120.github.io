@@ -9,8 +9,7 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="# 理解Python的装饰器
-
+<meta name="description" content="
 ```python
 @decorator
 def foo():
@@ -27,7 +26,7 @@ def decorator(func):
         print('in decorator')
         return func(*args,*kw)
     return warp
-s
+
 @decorator
 def foo():
     print('in foo')
@@ -99,10 +98,33 @@ foo2()
 # msg1
 ```
 
-因为装饰器实际上是语法糖，所以有一个问题，装饰器返回的函数并不是原本的函数，原本的函数的一些属性（如文档字符串）可能会丢失。">
+因为装饰器实际上是语法糖，所以有一个问题，装饰器返回的函数并不是原本的函数，原本的函数的一些属性（如文档字符串）可能会丢失.
+
+解决方法是使用`functools.wraps`，它会将原来函数的属性复制到装饰器返回的函数中.
+
+```python
+from functools import wraps
+
+def my_decorator(f):
+    @wraps(f)
+    def wrapper(*args, **kw):
+        print('Calling decorated function')
+        return f(*args, **kw)
+
+    return wrapper
+
+@my_decorator
+def example():
+    '''Docstring'''
+    print('Called example function')
+
+example()  # Calling decorated functionCalled example function
+example.__name__  # 'example'
+example.__doc__  # 'Docstring'
+```
+。">
 <meta property="og:title" content="理解Python的装饰器">
-<meta property="og:description" content="# 理解Python的装饰器
-
+<meta property="og:description" content="
 ```python
 @decorator
 def foo():
@@ -119,7 +141,7 @@ def decorator(func):
         print('in decorator')
         return func(*args,*kw)
     return warp
-s
+
 @decorator
 def foo():
     print('in foo')
@@ -191,7 +213,31 @@ foo2()
 # msg1
 ```
 
-因为装饰器实际上是语法糖，所以有一个问题，装饰器返回的函数并不是原本的函数，原本的函数的一些属性（如文档字符串）可能会丢失。">
+因为装饰器实际上是语法糖，所以有一个问题，装饰器返回的函数并不是原本的函数，原本的函数的一些属性（如文档字符串）可能会丢失.
+
+解决方法是使用`functools.wraps`，它会将原来函数的属性复制到装饰器返回的函数中.
+
+```python
+from functools import wraps
+
+def my_decorator(f):
+    @wraps(f)
+    def wrapper(*args, **kw):
+        print('Calling decorated function')
+        return f(*args, **kw)
+
+    return wrapper
+
+@my_decorator
+def example():
+    '''Docstring'''
+    print('Called example function')
+
+example()  # Calling decorated functionCalled example function
+example.__name__  # 'example'
+example.__doc__  # 'Docstring'
+```
+。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://niyoh120.github.io/post/li-jie-Python-de-zhuang-shi-qi.html">
 <meta property="og:image" content="https://github.githubassets.com/favicons/favicon.svg">
@@ -250,8 +296,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><h1>理解Python的装饰器</h1>
-<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-en">@<span class="pl-s1">decorator</span></span>
+<div class="markdown-body" id="postBody"><div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-en">@<span class="pl-s1">decorator</span></span>
 <span class="pl-k">def</span> <span class="pl-en">foo</span>():
 	<span class="pl-k">pass</span></pre></div>
 <p>实际上等于 <code class="notranslate">foo=decorator(foo)</code></p>
@@ -261,7 +306,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
         <span class="pl-en">print</span>(<span class="pl-s">"in decorator"</span>)
         <span class="pl-k">return</span> <span class="pl-en">func</span>(<span class="pl-c1">*</span><span class="pl-s1">args</span>,<span class="pl-c1">*</span><span class="pl-s1">kw</span>)
     <span class="pl-k">return</span> <span class="pl-s1">warp</span>
-<span class="pl-s1">s</span>
+
 <span class="pl-en">@<span class="pl-s1">decorator</span></span>
 <span class="pl-k">def</span> <span class="pl-en">foo</span>():
     <span class="pl-en">print</span>(<span class="pl-s">"in foo"</span>)
@@ -322,8 +367,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <span class="pl-c"># msg2</span>
 <span class="pl-c"># msg1</span></pre></div>
-<p>因为装饰器实际上是语法糖，所以有一个问题，装饰器返回的函数并不是原本的函数，原本的函数的一些属性（如文档字符串）可能会丢失。</p>
-<p>解决方法是使用<code class="notranslate">functools.wraps</code>，它会将原来函数的属性复制到装饰器返回的函数中。</p>
+<p>因为装饰器实际上是语法糖，所以有一个问题，装饰器返回的函数并不是原本的函数，原本的函数的一些属性（如文档字符串）可能会丢失.</p>
+<p>解决方法是使用<code class="notranslate">functools.wraps</code>，它会将原来函数的属性复制到装饰器返回的函数中.</p>
 <div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">from</span> <span class="pl-s1">functools</span> <span class="pl-k">import</span> <span class="pl-s1">wraps</span>
 
 <span class="pl-k">def</span> <span class="pl-en">my_decorator</span>(<span class="pl-s1">f</span>):

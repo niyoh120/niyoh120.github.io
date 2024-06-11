@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Blog Title</title><link>https://niyoh120.github.io</link><description>Blog description</description><copyright>Blog Title</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://github.githubassets.com/favicons/favicon.svg</url><title>avatar</title><link>https://niyoh120.github.io</link></image><lastBuildDate>Tue, 11 Jun 2024 07:59:19 +0000</lastBuildDate><managingEditor>Blog Title</managingEditor><ttl>60</ttl><webMaster>Blog Title</webMaster><item><title>理解Python的装饰器</title><link>https://niyoh120.github.io/post/li-jie-Python-de-zhuang-shi-qi.html</link><description># 理解Python的装饰器&#13;
-&#13;
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Blog Title</title><link>https://niyoh120.github.io</link><description>Blog description</description><copyright>Blog Title</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://github.githubassets.com/favicons/favicon.svg</url><title>avatar</title><link>https://niyoh120.github.io</link></image><lastBuildDate>Tue, 11 Jun 2024 08:02:26 +0000</lastBuildDate><managingEditor>Blog Title</managingEditor><ttl>60</ttl><webMaster>Blog Title</webMaster><item><title>理解Python的装饰器</title><link>https://niyoh120.github.io/post/li-jie-Python-de-zhuang-shi-qi.html</link><description>&#13;
 ```python&#13;
 @decorator&#13;
 def foo():&#13;
@@ -17,7 +16,7 @@ def decorator(func):&#13;
         print('in decorator')&#13;
         return func(*args,*kw)&#13;
     return warp&#13;
-s&#13;
+&#13;
 @decorator&#13;
 def foo():&#13;
     print('in foo')&#13;
@@ -89,4 +88,28 @@ foo2()&#13;
 # msg1&#13;
 ```&#13;
 &#13;
-因为装饰器实际上是语法糖，所以有一个问题，装饰器返回的函数并不是原本的函数，原本的函数的一些属性（如文档字符串）可能会丢失。</description><guid isPermaLink="true">https://niyoh120.github.io/post/li-jie-Python-de-zhuang-shi-qi.html</guid><pubDate>Tue, 11 Jun 2024 07:58:52 +0000</pubDate></item></channel></rss>
+因为装饰器实际上是语法糖，所以有一个问题，装饰器返回的函数并不是原本的函数，原本的函数的一些属性（如文档字符串）可能会丢失.&#13;
+&#13;
+解决方法是使用`functools.wraps`，它会将原来函数的属性复制到装饰器返回的函数中.&#13;
+&#13;
+```python&#13;
+from functools import wraps&#13;
+&#13;
+def my_decorator(f):&#13;
+    @wraps(f)&#13;
+    def wrapper(*args, **kw):&#13;
+        print('Calling decorated function')&#13;
+        return f(*args, **kw)&#13;
+&#13;
+    return wrapper&#13;
+&#13;
+@my_decorator&#13;
+def example():&#13;
+    '''Docstring'''&#13;
+    print('Called example function')&#13;
+&#13;
+example()  # Calling decorated functionCalled example function&#13;
+example.__name__  # 'example'&#13;
+example.__doc__  # 'Docstring'&#13;
+```&#13;
+。</description><guid isPermaLink="true">https://niyoh120.github.io/post/li-jie-Python-de-zhuang-shi-qi.html</guid><pubDate>Tue, 11 Jun 2024 07:58:52 +0000</pubDate></item></channel></rss>
