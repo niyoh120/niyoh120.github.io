@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Blog Title</title><link>https://niyoh120.github.io</link><description>Blog description</description><copyright>Blog Title</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://github.githubassets.com/favicons/favicon.svg</url><title>avatar</title><link>https://niyoh120.github.io</link></image><lastBuildDate>Tue, 11 Jun 2024 08:44:08 +0000</lastBuildDate><managingEditor>Blog Title</managingEditor><ttl>60</ttl><webMaster>Blog Title</webMaster><item><title>Rust 基础</title><link>https://niyoh120.github.io/post/Rust%20-ji-chu.html</link><description>## 类型&#13;
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Blog Title</title><link>https://niyoh120.github.io</link><description>Blog description</description><copyright>Blog Title</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://github.githubassets.com/favicons/favicon.svg</url><title>avatar</title><link>https://niyoh120.github.io</link></image><lastBuildDate>Tue, 11 Jun 2024 16:24:17 +0000</lastBuildDate><managingEditor>Blog Title</managingEditor><ttl>60</ttl><webMaster>Blog Title</webMaster><item><title>Rust 基础</title><link>https://niyoh120.github.io/post/Rust%20-ji-chu.html</link><description>## 类型&#13;
 &#13;
 ### 变量&#13;
 &#13;
@@ -124,7 +124,10 @@ Diverging functions never return. They are marked using !, which is an empty typ
 - `Box&lt;T&gt;` 对应C++中的`unique_ptr`&#13;
 - `Rc&lt;T&gt;`和`RefCell&lt;T&gt;`对应C++中的`shared_ptr`，区别是前者只能返回inmutable引用，后者可以返回inmutable或mutable引用&#13;
 - `Weak&lt;T&gt;`对应C++中的`weak_ptr`&#13;
-- `Arc&lt;T&gt;`是线程安全的`RC&lt;T&gt;`(Atomically Reference Counted)，只能返回immutable引用，如果需要修改状态，可以在其中装`Mutex`,`Rwlock`或者原子类型。</description><guid isPermaLink="true">https://niyoh120.github.io/post/Rust%20-ji-chu.html</guid><pubDate>Tue, 11 Jun 2024 08:43:40 +0000</pubDate></item><item><title>理解Python的生成器</title><link>https://niyoh120.github.io/post/li-jie-Python-de-sheng-cheng-qi.html</link><description>定义一个生成器的方法&#13;
+- `Arc&lt;T&gt;`是线程安全的`RC&lt;T&gt;`(Atomically Reference Counted)，只能返回immutable引用，如果需要修改状态，可以在其中装`Mutex`,`Rwlock`或者原子类型。</description><guid isPermaLink="true">https://niyoh120.github.io/post/Rust%20-ji-chu.html</guid><pubDate>Tue, 11 Jun 2024 08:43:40 +0000</pubDate></item><item><title>简单的笔记本电脑选购指南</title><link>https://niyoh120.github.io/post/jian-dan-de-bi-ji-ben-dian-nao-xuan-gou-zhi-nan.html</link><description>## 基本守则&#13;
+&#13;
+- 不要去电脑城或任何非官方授权的实体店&#13;
+- 买前到网上搜索相关评测，或到笔记本吧、知乎等社区提问，避免踩坑。</description><guid isPermaLink="true">https://niyoh120.github.io/post/jian-dan-de-bi-ji-ben-dian-nao-xuan-gou-zhi-nan.html</guid><pubDate>Tue, 11 Jun 2024 08:40:30 +0000</pubDate></item><item><title>理解Python的生成器</title><link>https://niyoh120.github.io/post/li-jie-Python-de-sheng-cheng-qi.html</link><description>定义一个生成器的方法&#13;
 &#13;
 - 定义一个含有`yield`语句的函数&#13;
 - 定义一个实现了`__iter___`方法（迭代器协议），方法中含有yield语句的类&#13;
